@@ -1,0 +1,14 @@
+#Build env
+venv/
+bin/
+include/
+lib/
+share/
+
+#Mac artifacts
+.DS_Store
+._*
+
+#Test environment
+example.db
+frontend.py
