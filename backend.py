@@ -1,7 +1,6 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, abort
 from sqlalchemy import create_engine
-from json import dumps
 import sqlite3
 
 
@@ -15,44 +14,46 @@ conn.close()
 # Open connection to database
 e = create_engine('sqlite:///example.db')
 
-    
 app = Flask(__name__)
 api = Api(app)
 
-def abort_if_not_exist(task_number):
-    conn = e.connect()
-    query = conn.execute("select id from tasks")
-    if task_number not in query:
+def short_circut(task_number):
+    sql = e.connect()
+    query = sql.execute("select exists(select 1 from tasks where id='%s')"%task_number)
+    r = query.fetchone()
+    n = int(r[0])
+    if n != 1:
         abort(404, message="Oh snap, task {} doesn't exist".format(task_number))
 
 class task_list(Resource):
     def get(self):
-        conn = e.connect()
-        query = conn.execute("select id from tasks")
-        return {'task_id': [i[0] for i in query.cursor.fetchall()]}
+        sql = e.connect()
+        query = sql.execute("select id from tasks")
+        data = [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]
+        return data
 
     def put(self):
-        conn = e.connect()
+        sql = e.connect()
         data = request.form['data']
-        conn.execute("insert into tasks (`task_data`) values ('%s')"%data)
+        sql.execute("insert into tasks (`task_data`) values ('%s')"%data)
         return
 
 class task_detail(Resource):
     def get(self, task_number):
-        abort_if_not_exist(task_number)
-        conn = e.connect()
-        query = conn.execute("select * from tasks where id='%s'"%task_number)
-        result = {'data': [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]}
+        short_circut(task_number)
+        sql = e.connect()
+        query = sql.execute("select * from tasks where id='%s'"%task_number)
+        result = [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]
         return result
 
     def delete(self, task_number):
-        abort_if_not_exist(task_number)
-        conn = e.connect()
-        conn.execute("delete from tasks where id='%s'" % task_number)
+        short_circut(task_number)
+        sql = e.connect()
+        sql.execute("delete from tasks where id='%s'" % task_number)
         return
 
 api.add_resource(task_list, '/tasks')
-api.add_resource(task_detail, '/tasks/<string:task_number>')
+api.add_resource(task_detail, '/tasks/<int:task_number>')
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(debug=True, threaded=True)

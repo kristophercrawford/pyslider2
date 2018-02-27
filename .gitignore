@@ -4,6 +4,7 @@ bin/
 include/
 lib/
 share/
+man/
 
 #Mac artifacts
 .DS_Store
@@ -11,4 +12,3 @@ share/
 
 #Test environment
 example.db
-frontend.py
