@@ -1,15 +1,51 @@
-<!DOCTYPE html>
 <html>
-<head></head>
+<head>
+<style>
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+</style>
+</head>
+<title>Sample table</title>
 <body>
-    <table>
-        {% for key, value in result.iteritems() %}
+<h2>Sample table</h2>
+<table>
+  <tr>
+    <th>task id</th>
+  </tr>
 
-        <tr>
-            <th> {{ key }} </th>
-            <td> {{ value }} </td>
-        </tr>
-        {% endfor %}
-    </table>
+  {% for line in table %}
+  <tr>
+    <td>{{ line["id"] }}</td>
+  </tr>
+  {% endfor %}
+
+</table>
+
+<h2>Sample table2</h2>
+<table>
+  <tr>
+    <th>task id</th>
+    <th>insert time</th>
+    <th>task data</th>
+  </tr>
+
+  {% for line in table2 %}
+  <tr>
+    <td>{{ line["id"] }}</td>
+    <td>{{ line["insert_time"] }}</td>
+    <td>{{ line["task_data"] }}</td>
+  </tr>
+  {% endfor %}
+
+</table>
+
+<h2>Data dump</h2>
+{{ table }}
+{{ table2 }}
 </body>
 </html>
