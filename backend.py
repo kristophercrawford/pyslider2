@@ -1,22 +1,24 @@
 from flask import Flask, request
 from flask_restful import Resource, Api, abort
-from sqlalchemy import create_engine
-import sqlite3
+from sqlalchemy_utils import database_exists, create_database
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, DateTime, func, String
 
-
-# Create sqlite database
-conn = sqlite3.connect('example.db')
-c = conn.cursor()
-c.execute('''CREATE TABLE IF NOT EXISTS tasks(id INTEGER PRIMARY KEY AUTOINCREMENT, insert_time DATETIME DEFAULT current_timestamp, task_data TEXT)''')
-conn.commit()
-conn.close()
-
-# Open connection to database
+# Open connection to database and create database and table if one is not present
 e = create_engine('sqlite:///example.db')
+metadata = MetaData(e)
+
+if not e.dialect.has_table(e, 'tasks'):
+    t = Table('tasks', metadata,
+          Column('id', Integer, primary_key=True, nullable=False),
+          Column('insert_time', DateTime, server_default=func.now()),
+          Column('task_data', String(128)),
+    )
+    t.create()
 
 app = Flask(__name__)
 api = Api(app)
 
+# This function accepts a task number and will send back a 404 message if that task doesn't exist
 def short_circut(task_number):
     sql = e.connect()
     query = sql.execute("select exists(select 1 from tasks where id='%s')"%task_number)

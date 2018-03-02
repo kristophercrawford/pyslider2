@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/task_summary')
 def task_summary():
     task_list = requests.get('http://127.0.0.1:5000/tasks')
-    return render_template('test2.html', table=task_list.json())
+    return render_template('test.html', table=task_list.json())
 
 @app.route('/task_detail')
 def task_detail():
@@ -15,16 +15,15 @@ def task_detail():
 
     # Initalize a counter
     counter = 0
-    a = ''
 
-    for each in task_list.json():
-        row = each['id']
+    for task in task_list.json():
+        row = task['id']
         req = requests.get('http://127.0.0.1:5000/tasks/%s'%row)
         #Increment the counter
         counter += 1
         if counter >= 2:
             b = req.json()
-            # Extend json array
+            # Extend array
             a.extend(b)
         else:
             a = req.json()
