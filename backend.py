@@ -9,9 +9,13 @@ metadata = MetaData(e)
 
 if not e.dialect.has_table(e, 'tasks'):
     t = Table('tasks', metadata,
-          Column('id', Integer, primary_key=True, nullable=False),
-          Column('insert_time', DateTime, server_default=func.now()),
-          Column('task_data', String(128)),
+              Column('id', Integer, primary_key=True, nullable=False),
+              Column('insert_time', DateTime, server_default=func.now()),
+              Column('start_time', DateTime),
+              Column('direction', String(80)),
+              Column('shots', Integer),
+              Column('time_delay', Integer),
+              Column('status', Integer),
     )
     t.create()
 
@@ -34,11 +38,16 @@ class task_list(Resource):
         data = [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]
         return data
 
+
     def put(self):
         sql = e.connect()
-        data = request.form['data']
-        sql.execute("insert into tasks (`task_data`) values ('%s')"%data)
+        direction = request.form['direction']
+        start_time = request.form['start_time']
+        shots = request.form['shots']
+        time_delay = request.form['time_delay']
+        sql.execute("insert into tasks (`direction`, `start_time`, `shots`, `time_delay`) values ('%s', '%s', '%s', '%s')"%(direction, start_time, shots, time_delay))
         return
+
 
 class task_detail(Resource):
     def get(self, task_number):
@@ -48,11 +57,21 @@ class task_detail(Resource):
         result = [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]
         return result
 
+
     def delete(self, task_number):
         short_circut(task_number)
         sql = e.connect()
-        sql.execute("delete from tasks where id='%s'" % task_number)
+        sql.execute("delete from tasks where id='%s'"%task_number)
         return
+
+
+    def put(self, task_number):
+        short_circut(task_number)
+        sql = e.connect()
+        status = request.form['status']
+        sql.execute("update tasks set status='%s' where id='%s'"%(status, task_number))
+        return
+
 
 api.add_resource(task_list, '/tasks')
 api.add_resource(task_detail, '/tasks/<int:task_number>')
