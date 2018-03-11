@@ -5,49 +5,20 @@ import requests
 app = Flask(__name__)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def homepage():
     return render_template('home.html')
 
 
-@app.route('/task_summary')
-def task_summary():
-    task_list = requests.get('http://127.0.0.1:5000/tasks')
-    # If there are no tasks, return no data
-    if not task_list.json():
-        return render_template('test.html')
-    else:
-        return render_template('test.html', table=task_list.json())
-
-
-@app.route('/task_detail')
-def task_detail():
-    task_list = requests.get('http://127.0.0.1:5000/tasks')
-    # If there are no tasks, return no data
-    if not task_list.json():
-        return render_template('test.html')
-    # If there is one task, gather the details and return the data
-    elif len(task_list.json()) == 1:
-        detail = requests.get('http://127.0.0.1:5000/tasks/%s'%task_list.json()[0]['id'])
-        return render_template('test.html', table2=detail.json())
-    # If there are multiple tasks, iterate through each task
-    else:
-        detail = []
-        for task in task_list.json():
-            row = task['id']
-            # Extend list
-            detail.extend(requests.get('http://127.0.0.1:5000/tasks/%s'%row).json())
-        return render_template('test.html', table2=detail)
-
 @app.route('/status')
-def status_page():
+def statusPage():
     task_list = requests.get('http://127.0.0.1:5000/tasks')
     # If there are no tasks, return no data
     if not task_list.json():
         return render_template('status.html')
     # If there is one task, gather the details and return the data
     elif len(task_list.json()) == 1:
-        detail = requests.get('http://127.0.0.1:5000/tasks/%s'%task_list.json()[0]['id'])
+        detail = requests.get('http://127.0.0.1:5000/tasks/{}'.format(task_list.json()[0]['id']))
         return render_template('status.html', table=detail.json())
     # If there are multiple tasks, iterate through each task
     else:
@@ -55,8 +26,25 @@ def status_page():
         for task in task_list.json():
             row = task['id']
             # Extend list
-            detail.extend(requests.get('http://127.0.0.1:5000/tasks/%s'%row).json())
+            detail.extend(requests.get('http://127.0.0.1:5000/tasks/{}'.format(row)).json())
         return render_template('status.html', table=detail)
+
+
+@app.route('/linear')
+def linearSliderPage():
+    return render_template("linear.html")
+
+
+# Route for accepting posted data from forms
+@app.route('/postdata', methods=['POST'])
+def postdata():
+    formInput = request.form
+    print(request.form)
+    timeDelay = formInput['timeDelay']
+    direction = formInput['direction']
+    shots = formInput['shots']
+    requests.put('http://127.0.0.1:5000/tasks', data = {'timeDelay':timeDelay, 'direction':direction, 'shots':shots})
+    return url_for('statusPage')
 
 
 if __name__ == '__main__':

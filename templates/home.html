@@ -1,17 +1,22 @@
 {% extends 'layout.html' %} {% block body %} 
 <nav class="navbar navbar-inverse">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<a class="navbar-brand" href="#">PySlider</a> 
+	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	    <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+    		<div class="navbar-header">
+			<a class="navbar-brand" href="/">PySlider</a> 
 		</div>
+	<div class="collapse navbar-collapse">
 		<ul class="nav navbar-nav">
-			<li class="active"><a href="/">Home</a></li>
-			<li><a href="/linear">Linear Slider</a></li>
-			<li><a href="/pan">Panoramic Slider</a></li>
-			<li><a href="/status">Status</a></li>
+			<li><a href="/linear" data-toggle="collapse" data-target=".navbar-collapse.in">Linear Slider</a></li>
+			<li><a href="/pan" data-toggle="collapse" data-target=".navbar-collapse.in">Panoramic Slider</a></li>
+			<li><a href="/status" data-toggle="collapse" data-target=".navbar-collapse.in">Status</a></li>
 		</ul>
 		<form id="shutdown" class="navbar-form navbar-right">
-			<button type="calibrate" class="btn btn-primary"><a style="color: inherit; text-decoration: none" href="/calibrate">Calibrate</a></button> <button type="shutdown" class="btn btn-danger"><a style="color: inherit; text-decoration: none" href="/shutdown_pi" onclick="return confirm('Are you sure?');">Shutdown</a></button> 
+			<button type="calibrate" class="btn btn-primary"><a style="color: inherit; text-decoration: none" href="/calibrate">Calibrate</a></button> 
+			<button type="shutdown" class="btn btn-danger"><a style="color: inherit; text-decoration: none" href="/shutdown_pi" onclick="return confirm('Are you sure?');">Shutdown</a></button> 
 		</form>
 	</div>
 </nav>

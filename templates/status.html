@@ -7,9 +7,11 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
     </button>
+    		<div class="navbar-header">
+			<a class="navbar-brand" href="/">PySlider</a> 
+		</div>
 	<div class="collapse navbar-collapse">
 		<ul class="nav navbar-nav">
-			<li><a href="/">Home</a></li>
 			<li><a href="/linear" data-toggle="collapse" data-target=".navbar-collapse.in">Linear Slider</a></li>
 			<li><a href="/pan" data-toggle="collapse" data-target=".navbar-collapse.in">Panoramic Slider</a></li>
 			<li class="active"><a href="/status" data-toggle="collapse" data-target=".navbar-collapse.in">Status</a></li>
@@ -25,7 +27,6 @@
   <tr>
     <th>task id</th>
     <th>insert time</th>
-    <th>start time</th>
     <th>direction</th>
     <th>time delay</th>
     <th>shots</th>
@@ -35,10 +36,9 @@
   {% for line in table %}
   <tr>
     <td>{{ line["id"] }}</td>
-    <td>{{ line["insert_time"] }}</td>
-    <td>{{ line["start_time"] }}</td>
-    <td>{{ line["direction"] }}</td>
-    <td>{{ line["time_delay"] }}</td>
+    <td>{{ line["insertTime"] }}</td>
+    <td>{% if line["direction"] == "0" %}Left to Right{% else %}Right to Left{% endif %}</td>
+    <td>{{ line["timeDelay"] }}</td>
     <td>{{ line["shots"] }}</td>
     <td>{{ line["status"] }}</td>
   </tr>

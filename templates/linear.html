@@ -1,40 +1,44 @@
-{% extends 'layout.html' %} {% block body %} 
+{% extends 'layout.html' %} {% block body %}
 <nav class="navbar navbar-inverse">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<a class="navbar-brand" href="#">PySlider</a> 
+	<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+	    <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+    		<div class="navbar-header">
+			<a class="navbar-brand" href="/">PySlider</a> 
 		</div>
+	<div class="collapse navbar-collapse">
 		<ul class="nav navbar-nav">
-			<li> <a href="/"> Home </a> </li>
-			<li class="active"> <a href="/linear">Linear Slider</a></li>
-			<li> <a href="/pan"> Panoramic Slider</a></li>
-			<li><a href="/status">Status</a></li>
+			<li class="active"><a href="/linear" data-toggle="collapse" data-target=".navbar-collapse.in">Linear Slider</a></li>
+			<li><a href="/pan" data-toggle="collapse" data-target=".navbar-collapse.in">Panoramic Slider</a></li>
+			<li><a href="/status" data-toggle="collapse" data-target=".navbar-collapse.in">Status</a></li>
 		</ul>
 		<form id="shutdown" class="navbar-form navbar-right">
-			<button type="calibrate" class="btn btn-primary"><a style="color: inherit; text-decoration: none" href="/calibrate">Calibrate</a></button>
+			<button type="calibrate" class="btn btn-primary"><a style="color: inherit; text-decoration: none" href="/calibrate">Calibrate</a></button> 
 			<button type="shutdown" class="btn btn-danger"><a style="color: inherit; text-decoration: none" href="/shutdown_pi" onclick="return confirm('Are you sure?');">Shutdown</a></button> 
 		</form>
 	</div>
 </nav>
-<div class='container'>
+<div class="container">
 	<h3>
 		Linear Slider 
 	</h3>
 	<form id="linear_form" method="POST">
 		<label> Time Delay Between Shots (seconds):&nbsp; </label> 
-		<input type="number" name="time_delay" required style="width: 60px;"> <br />
+		<input type="number" name="timeDelay" required style="width: 60px;"> <br />
 		<label> Number of Shots:&nbsp; </label> 
 		<input type="number" name="shots" required style="width: 60px;"> <br />
 		<label> Slider Direction:&nbsp; </label> 
 		<input type="radio" name="direction" value="0" required> Left to Right&nbsp; 
-		<input type="radio" name="direction" value="1" required> Right to Left<br> <br />
+		<input type="radio" name="direction" value="1" required> Right to Left<br />
 		<button class="btn btn-default" id="button" name="button">Submit</button> 
 	</form>
 </div>
 <br />
 {% with errors = get_flashed_messages(category_filter=["error"]) %} {% if errors %} 
 <div class="container alert alert-danger fade in alert-dismissable">
-	<a href="#" class="close" data-dismiss="alert" aria-label="close"> &times; </a> {%- for message in errors %} 
+	<a href="#" class="close" data-dismiss="alert" aria-label="close"> &times; </a> {% for message in errors %} 
 	<p>
 		{{ message }} 
 	</p>
@@ -48,10 +52,11 @@
 	</p>
 	{% endfor %} 
 </div>
-{% endif %} {% endwith %} <script type="text/javascript" src="{{url_for('static', filename='jquery-1.10.2.js') }}">
-</script>
-<script type="text/javascript">
+{% endif %} 
+{% endwith %} 
 
+<script type="text/javascript">
+	
 		var linear_form = $('#linear_form');
 		
 		linear_form.submit(function (e) {
@@ -64,11 +69,12 @@
             window.location.href = "/status";
         },
 		        error: function(result) {
-		            alert('error');
+		            alert(err.Message);
 		        }
 		    });
 		});
 			
 			
 </script>
+
 {% endblock %} 

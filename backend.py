@@ -10,11 +10,10 @@ metadata = MetaData(e)
 if not e.dialect.has_table(e, 'tasks'):
     t = Table('tasks', metadata,
               Column('id', Integer, primary_key=True, nullable=False),
-              Column('insert_time', DateTime, server_default=func.now()),
-              Column('start_time', DateTime),
-              Column('direction', String(80)),
+              Column('insertTime', DateTime, server_default=func.now()),
+              Column('direction', Integer),
               Column('shots', Integer),
-              Column('time_delay', Integer),
+              Column('timeDelay', Integer),
               Column('status', Integer),
     )
     t.create()
@@ -23,15 +22,15 @@ app = Flask(__name__)
 api = Api(app)
 
 # This function accepts a task number and will send back a 404 message if that task doesn't exist
-def short_circut(task_number):
+def shortCircut(taskNumber):
     sql = e.connect()
-    query = sql.execute("select exists(select 1 from tasks where id='%s')"%task_number)
+    query = sql.execute("select exists(select 1 from tasks where id='{}')".format(taskNumber))
     r = query.fetchone()
     n = int(r[0])
     if n != 1:
-        abort(404, message="Oh snap, task {} doesn't exist".format(task_number))
+        abort(404, message="Oh snap, task {} doesn't exist".format(taskNumber))
 
-class task_list(Resource):
+class taskList(Resource):
     def get(self):
         sql = e.connect()
         query = sql.execute("select id from tasks")
@@ -42,39 +41,47 @@ class task_list(Resource):
     def put(self):
         sql = e.connect()
         direction = request.form['direction']
-        start_time = request.form['start_time']
         shots = request.form['shots']
-        time_delay = request.form['time_delay']
-        sql.execute("insert into tasks (`direction`, `start_time`, `shots`, `time_delay`) values ('%s', '%s', '%s', '%s')"%(direction, start_time, shots, time_delay))
+        timeDelay = request.form['timeDelay']
+        sql.execute("insert into tasks (`direction`, `shots`, `timeDelay`) values ('{}', '{}', '{}')".format(direction, shots, timeDelay))
         return
 
 
-class task_detail(Resource):
-    def get(self, task_number):
-        short_circut(task_number)
+class taskDetail(Resource):
+    def get(self, taskNumber):
+        shortCircut(taskNumber)
         sql = e.connect()
-        query = sql.execute("select * from tasks where id='%s'"%task_number)
+        query = sql.execute("select * from tasks where id='{}'".format(taskNumber))
         result = [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]
         return result
 
 
-    def delete(self, task_number):
-        short_circut(task_number)
+    def delete(self, taskNumber):
+        shortCircut(taskNumber)
         sql = e.connect()
-        sql.execute("delete from tasks where id='%s'"%task_number)
+        sql.execute("delete from tasks where id='{}'".format(taskNumber))
         return
 
 
-    def put(self, task_number):
-        short_circut(task_number)
+    def put(self, taskNumber):
+        shortCircut(taskNumber)
         sql = e.connect()
         status = request.form['status']
-        sql.execute("update tasks set status='%s' where id='%s'"%(status, task_number))
+        sql.execute("update tasks set status='{}' where id='{}'".format(status, taskNumber))
         return
 
 
-api.add_resource(task_list, '/tasks')
-api.add_resource(task_detail, '/tasks/<int:task_number>')
+class nextTask(Resource):
+    def get(self):
+        sql = e.connect()
+        query = sql.execute("select * from tasks order by insertTime asc limit 1")
+        result = [dict(zip(tuple (query.keys()) ,i)) for i in query.cursor]
+        return result
+
+
+api.add_resource(taskList, '/tasks')
+api.add_resource(taskDetail, '/tasks/<int:taskNumber>')
+api.add_resource(nextTask, '/nexttask')
 
 if __name__ == '__main__':
     app.run(debug=True, threaded=True)
